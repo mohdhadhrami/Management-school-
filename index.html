@@ -6,6 +6,8 @@
     <title>نظام سجل الدرجات الإلكتروني</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- مكتبة SheetJS للتعامل مع ملفات Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
     <!-- الشريط العلوي -->
@@ -167,9 +169,20 @@
                         <h2>إدارة الطلاب</h2>
                         <p class="page-description">إضافة وتعديل بيانات الطلاب</p>
                     </div>
-                    <button class="btn btn-primary" id="addStudentBtn">
-                        <i class="fas fa-plus"></i> إضافة طالب جديد
-                    </button>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="addStudentBtn">
+                            <i class="fas fa-plus"></i> إضافة طالب جديد
+                        </button>
+                        <button class="btn btn-success" id="importStudentsBtn">
+                            <i class="fas fa-file-import"></i> استيراد من Excel
+                        </button>
+                        <button class="btn btn-secondary" id="exportStudentsBtn">
+                            <i class="fas fa-file-export"></i> تصدير
+                        </button>
+                        <button class="btn btn-secondary" id="downloadTemplateBtn">
+                            <i class="fas fa-download"></i> تحميل القالب
+                        </button>
+                    </div>
                 </div>
 
                 <div class="filters-bar">
@@ -229,9 +242,14 @@
                         <h2>كشف الدرجات</h2>
                         <p class="page-description">عرض وإدخال درجات الطلاب</p>
                     </div>
-                    <button class="btn btn-primary" id="exportGradesBtn">
-                        <i class="fas fa-file-excel"></i> تصدير Excel
-                    </button>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="exportGradesBtn">
+                            <i class="fas fa-file-export"></i> تصدير
+                        </button>
+                        <button class="btn btn-success" id="exportToPortalBtn">
+                            <i class="fas fa-cloud-upload-alt"></i> إرسال للبوابة
+                        </button>
+                    </div>
                 </div>
 
                 <div class="filters-bar">
@@ -327,6 +345,18 @@
                                 <span>تفعيل الإشعارات</span>
                                 <input type="checkbox" id="notificationsToggle">
                             </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3><i class="fas fa-cloud"></i> البوابة التعليمية</h3>
+                        <div class="settings-content">
+                            <p style="color: var(--text-light); margin-bottom: 1rem;">
+                                قم بضبط إعدادات الاتصال مع البوابة التعليمية لتصدير البيانات
+                            </p>
+                            <button class="btn btn-secondary" id="openPortalSettingsBtn">
+                                <i class="fas fa-cog"></i> إعدادات البوابة
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -498,10 +528,13 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="assessmentClass">الصف *</label>
-                        <select id="assessmentClass" class="form-select" required>
-                            <option value="">اختر الصف</option>
-                        </select>
+                        <label for="assessmentClasses">الصفوف * (يمكن اختيار أكثر من صف)</label>
+                        <div id="assessmentClasses" class="classes-checkbox-container">
+                            <!-- سيتم ملؤها ديناميكياً -->
+                        </div>
+                        <small style="color: var(--text-light); font-size: 0.85rem; display: block; margin-top: 0.5rem;">
+                            <i class="fas fa-info-circle"></i> اختر الصفوف التي تريد تطبيق هذه الأداة عليها
+                        </small>
                     </div>
 
                     <div class="form-group">
@@ -532,7 +565,130 @@
         </div>
     </div>
 
+    <!-- نافذة اختيار صيغة التصدير -->
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>اختر صيغة التصدير</h3>
+                <button class="modal-close" id="closeExportModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="export-options">
+                    <button class="export-option-btn" onclick="app.exportData('json')">
+                        <i class="fas fa-file-code fa-3x"></i>
+                        <h4>JSON</h4>
+                        <p>ملف بيانات منظم</p>
+                    </button>
+                    <button class="export-option-btn" onclick="app.exportData('csv')">
+                        <i class="fas fa-file-csv fa-3x"></i>
+                        <h4>CSV</h4>
+                        <p>ملف نصي مفصول بفواصل</p>
+                    </button>
+                    <button class="export-option-btn" onclick="app.exportData('xml')">
+                        <i class="fas fa-file-code fa-3x"></i>
+                        <h4>XML</h4>
+                        <p>ملف XML منظم</p>
+                    </button>
+                    <button class="export-option-btn" onclick="app.exportData('excel')">
+                        <i class="fas fa-file-excel fa-3x"></i>
+                        <h4>Excel</h4>
+                        <p>ملف جداول بيانات</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إعدادات البوابة التعليمية -->
+    <div id="portalSettingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>إعدادات البوابة التعليمية</h3>
+                <button class="modal-close" id="closePortalSettingsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="portalSettingsForm">
+                    <div class="form-group">
+                        <label for="portalSchoolId">رقم المدرسة في البوابة *</label>
+                        <input type="text" id="portalSchoolId" class="form-input" required placeholder="مثال: SC12345">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="portalTeacherId">رقم المعلم في البوابة *</label>
+                        <input type="text" id="portalTeacherId" class="form-input" required placeholder="مثال: T67890">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="portalApiUrl">رابط API البوابة</label>
+                        <input type="url" id="portalApiUrl" class="form-input" placeholder="https://api.example.com/grades">
+                        <small style="color: var(--text-light); font-size: 0.85rem; display: block; margin-top: 0.5rem;">
+                            اتركه فارغاً إذا كنت تريد تحميل ملف JSON فقط
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="portalApiToken">مفتاح API</label>
+                        <input type="password" id="portalApiToken" class="form-input" placeholder="أدخل مفتاح API">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> حفظ الإعدادات
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="cancelPortalSettings">
+                            <i class="fas fa-times"></i> إلغاء
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تقدم الاستيراد -->
+    <div id="importProgressModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>جاري استيراد الطلاب...</h3>
+            </div>
+            <div class="modal-body">
+                <div class="import-progress">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="importProgressBar"></div>
+                    </div>
+                    <p id="importProgressText">جاري المعالجة...</p>
+                    <div id="importResults" class="import-results" style="display: none;">
+                        <!-- سيتم عرض النتائج هنا -->
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <button class="btn btn-primary" id="closeImportProgress" style="display: none;">
+                            <i class="fas fa-check"></i> إغلاق
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- حقل استيراد مخفي -->
+    <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display: none;">
+
     <script src="db.js"></script>
+    <script src="import-export.js"></script>
     <script src="app.js"></script>
+    <script src="app-extensions.js"></script>
+    <script>
+        // تهيئة وظائف الاستيراد والتصدير بعد تحميل التطبيق
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (app && app.setupImportExport) {
+                    app.setupImportExport();
+                }
+            }, 100);
+        });
+    </script>
 </body>
 </html>

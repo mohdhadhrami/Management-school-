@@ -2,7 +2,7 @@
 class GradesDB {
     constructor() {
         this.dbName = 'GradesManagementDB';
-        this.version = 1;
+        this.version = 2; // تحديث الإصدار لدعم الحقول الإضافية
         this.db = null;
     }
 
