@@ -2,7 +2,7 @@
 class GradesDB {
     constructor() {
         this.dbName = 'GradesManagementDB';
-        this.version = 2; // تحديث الإصدار لدعم الحقول الإضافية
+        this.version = 3; // تحديث الإصدار لدعم المتابعة اليومية
         this.db = null;
     }
 
@@ -61,6 +61,33 @@ class GradesDB {
                     const activitiesStore = db.createObjectStore('activities', { keyPath: 'id', autoIncrement: true });
                     activitiesStore.createIndex('timestamp', 'timestamp', { unique: false });
                     activitiesStore.createIndex('type', 'type', { unique: false });
+                }
+
+                // إنشاء جدول الحضور والغياب
+                if (!db.objectStoreNames.contains('attendance')) {
+                    const attendanceStore = db.createObjectStore('attendance', { keyPath: 'id', autoIncrement: true });
+                    attendanceStore.createIndex('studentId', 'studentId', { unique: false });
+                    attendanceStore.createIndex('classId', 'classId', { unique: false });
+                    attendanceStore.createIndex('date', 'date', { unique: false });
+                    attendanceStore.createIndex('studentDate', ['studentId', 'date'], { unique: true });
+                }
+
+                // إنشاء جدول السلوكيات
+                if (!db.objectStoreNames.contains('behaviors')) {
+                    const behaviorsStore = db.createObjectStore('behaviors', { keyPath: 'id', autoIncrement: true });
+                    behaviorsStore.createIndex('studentId', 'studentId', { unique: false });
+                    behaviorsStore.createIndex('classId', 'classId', { unique: false });
+                    behaviorsStore.createIndex('date', 'date', { unique: false });
+                    behaviorsStore.createIndex('type', 'type', { unique: false });
+                    behaviorsStore.createIndex('severity', 'severity', { unique: false });
+                }
+
+                // إنشاء جدول إشعارات الواتساب
+                if (!db.objectStoreNames.contains('whatsappNotifications')) {
+                    const notificationsStore = db.createObjectStore('whatsappNotifications', { keyPath: 'id', autoIncrement: true });
+                    notificationsStore.createIndex('studentId', 'studentId', { unique: false });
+                    notificationsStore.createIndex('timestamp', 'timestamp', { unique: false });
+                    notificationsStore.createIndex('status', 'status', { unique: false });
                 }
 
                 console.log('تم إنشاء هيكل قاعدة البيانات');

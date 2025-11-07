@@ -1196,3 +1196,306 @@ body {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
 }
+
+/* تنسيقات المتابعة اليومية - الحضور والغياب والسلوكيات */
+
+.attendance-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.attendance-students-grid {
+    display: grid;
+    gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 1rem;
+}
+
+.attendance-student-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: var(--bg-color);
+    border-radius: 10px;
+    transition: var(--transition);
+}
+
+.attendance-student-item:hover {
+    background: var(--card-bg);
+    box-shadow: var(--shadow-sm);
+}
+
+.student-info-att {
+    flex: 1;
+}
+
+.student-name-att {
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+
+.student-number-att {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.attendance-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.attendance-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--border-color);
+    background: var(--card-bg);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.attendance-btn.selected-present {
+    background: var(--success-color);
+    color: white;
+    border-color: var(--success-color);
+}
+
+.attendance-btn.selected-absent {
+    background: var(--danger-color);
+    color: white;
+    border-color: var(--danger-color);
+}
+
+.attendance-btn.selected-late {
+    background: var(--warning-color);
+    color: white;
+    border-color: var(--warning-color);
+}
+
+.attendance-btn:hover {
+    transform: scale(1.05);
+}
+
+/* قائمة السلوكيات */
+.behaviors-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.behavior-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    border-right: 4px solid var(--primary-color);
+}
+
+.behavior-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.behavior-card.severity-positive {
+    border-right-color: var(--success-color);
+}
+
+.behavior-card.severity-minor {
+    border-right-color: var(--warning-color);
+}
+
+.behavior-card.severity-moderate {
+    border-right-color: #ff9800;
+}
+
+.behavior-card.severity-severe {
+    border-right-color: var(--danger-color);
+}
+
+.behavior-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1rem;
+}
+
+.behavior-student-info {
+    flex: 1;
+}
+
+.behavior-student-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+
+.behavior-date-time {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.behavior-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.behavior-content {
+    margin-bottom: 1rem;
+}
+
+.behavior-type {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.behavior-type.severity-positive {
+    background: rgba(67, 233, 123, 0.1);
+    color: var(--success-color);
+}
+
+.behavior-type.severity-minor {
+    background: rgba(255, 167, 38, 0.1);
+    color: var(--warning-color);
+}
+
+.behavior-type.severity-moderate {
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+}
+
+.behavior-type.severity-severe {
+    background: rgba(245, 87, 108, 0.1);
+    color: var(--danger-color);
+}
+
+.behavior-notes {
+    color: var(--text-color);
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+}
+
+.behavior-action {
+    background: var(--bg-color);
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.behavior-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.notification-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.notification-status.sent {
+    color: var(--success-color);
+}
+
+.notification-status.pending {
+    color: var(--warning-color);
+}
+
+.notification-status.failed {
+    color: var(--danger-color);
+}
+
+/* صندوق معلومات */
+.info-box {
+    background: rgba(102, 126, 234, 0.1);
+    border-right: 4px solid var(--primary-color);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+.info-box i {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+.info-box p {
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* checkbox label */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.checkbox-label:hover {
+    background: var(--border-color);
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.checkbox-label span {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+/* تحسينات responsive للمتابعة اليومية */
+@media (max-width: 768px) {
+    .attendance-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .attendance-controls {
+        flex-direction: column;
+    }
+
+    .attendance-btn {
+        width: 100%;
+    }
+
+    .behavior-header {
+        flex-direction: column;
+    }
+
+    .behavior-actions {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .attendance-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

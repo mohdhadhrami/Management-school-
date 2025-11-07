@@ -1,0 +1,310 @@
+<!-- صفحة الحضور والغياب -->
+<div id="attendance-page" class="page">
+    <div class="page-header">
+        <div>
+            <h2>الحضور والغياب</h2>
+            <p class="page-description">تسجيل ومتابعة حضور وغياب الطلاب</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn btn-success" id="recordAttendanceBtn">
+                <i class="fas fa-check-circle"></i> تسجيل الحضور
+            </button>
+            <button class="btn btn-primary" id="exportAttendanceBtn">
+                <i class="fas fa-file-export"></i> تصدير
+            </button>
+        </div>
+    </div>
+
+    <div class="filters-bar">
+        <div class="filter-group">
+            <label>الصف:</label>
+            <select id="attendanceFilterClass" class="form-select">
+                <option value="">اختر صف</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>التاريخ:</label>
+            <input type="date" id="attendanceFilterDate" class="form-input">
+        </div>
+        <div class="filter-group">
+            <button class="btn btn-secondary" id="loadAttendanceBtn">
+                <i class="fas fa-sync"></i> تحميل
+            </button>
+        </div>
+    </div>
+
+    <div class="attendance-stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value" id="attendancePresentCount">0</h3>
+                <p class="stat-label">حاضر</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);">
+                <i class="fas fa-user-times"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value" id="attendanceAbsentCount">0</h3>
+                <p class="stat-label">غائب</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value" id="attendanceLateCount">0</h3>
+                <p class="stat-label">متأخر</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value" id="attendanceTotalCount">0</h3>
+                <p class="stat-label">إجمالي الطلاب</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table" id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>رقم الطالب</th>
+                    <th>الاسم</th>
+                    <th>الحالة</th>
+                    <th>ملاحظات</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="5" class="empty-state">اختر صف وتاريخ لعرض الحضور</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- صفحة السلوكيات -->
+<div id="behaviors-page" class="page">
+    <div class="page-header">
+        <div>
+            <h2>السلوكيات والملاحظات</h2>
+            <p class="page-description">تسجيل ومتابعة سلوكيات الطلاب</p>
+        </div>
+        <button class="btn btn-primary" id="addBehaviorBtn">
+            <i class="fas fa-plus"></i> إضافة ملاحظة
+        </button>
+    </div>
+
+    <div class="filters-bar">
+        <div class="filter-group">
+            <label>الصف:</label>
+            <select id="behaviorFilterClass" class="form-select">
+                <option value="">جميع الصفوف</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>نوع الملاحظة:</label>
+            <select id="behaviorFilterType" class="form-select">
+                <option value="">جميع الأنواع</option>
+                <option value="إيجابي">إيجابي</option>
+                <option value="بسيط">بسيط</option>
+                <option value="متوسط">متوسط</option>
+                <option value="خطير">خطير</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>من تاريخ:</label>
+            <input type="date" id="behaviorFilterStartDate" class="form-input">
+        </div>
+        <div class="filter-group">
+            <label>إلى تاريخ:</label>
+            <input type="date" id="behaviorFilterEndDate" class="form-input">
+        </div>
+    </div>
+
+    <div class="behaviors-list" id="behaviorsList">
+        <p class="empty-state">لا توجد ملاحظات مسجلة</p>
+    </div>
+</div>
+
+<!-- نافذة تسجيل الحضور -->
+<div id="attendanceModal" class="modal">
+    <div class="modal-content" style="max-width: 900px;">
+        <div class="modal-header">
+            <h3>تسجيل الحضور والغياب</h3>
+            <button class="modal-close" id="closeAttendanceModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>الصف *</label>
+                <select id="attendanceModalClass" class="form-select" required>
+                    <option value="">اختر الصف</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>التاريخ *</label>
+                <input type="date" id="attendanceModalDate" class="form-input" required>
+            </div>
+
+            <div id="attendanceStudentsList" class="attendance-students-grid">
+                <!-- سيتم ملؤها ديناميكياً -->
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-primary" id="saveAttendanceBtn">
+                    <i class="fas fa-save"></i> حفظ الحضور
+                </button>
+                <button class="btn btn-secondary" id="cancelAttendanceModal">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة إضافة سلوك -->
+<div id="behaviorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="behaviorModalTitle">إضافة ملاحظة سلوكية</h3>
+            <button class="modal-close" id="closeBehaviorModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="behaviorForm">
+                <input type="hidden" id="behaviorId">
+
+                <div class="form-group">
+                    <label for="behaviorStudent">الطالب *</label>
+                    <select id="behaviorStudent" class="form-select" required>
+                        <option value="">اختر الطالب</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="behaviorDate">التاريخ *</label>
+                    <input type="date" id="behaviorDate" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="behaviorType">نوع الملاحظة *</label>
+                    <select id="behaviorType" class="form-select" required>
+                        <option value="">اختر النوع</option>
+                        <optgroup label="ملاحظات إيجابية">
+                            <option value="تفوق دراسي">تفوق دراسي</option>
+                            <option value="مشاركة فعالة">مشاركة فعالة</option>
+                            <option value="سلوك حسن">سلوك حسن</option>
+                            <option value="مساعدة زملاء">مساعدة زملاء</option>
+                        </optgroup>
+                        <optgroup label="ملاحظات تحتاج تحسين">
+                            <option value="حديث جانبي">حديث جانبي</option>
+                            <option value="عدم إحضار الكتاب">عدم إحضار الكتاب</option>
+                            <option value="عدم أداء الواجب">عدم أداء الواجب</option>
+                            <option value="نوم في الحصة">نوم في الحصة</option>
+                            <option value="عدم الانتباه">عدم الانتباه</option>
+                            <option value="تأخر عن الحصة">تأخر عن الحصة</option>
+                            <option value="عدم الالتزام">عدم الالتزام</option>
+                        </optgroup>
+                        <optgroup label="ملاحظات خطيرة">
+                            <option value="مشاجرة">مشاجرة</option>
+                            <option value="إساءة للمعلم">إساءة للمعلم</option>
+                            <option value="تخريب ممتلكات">تخريب ممتلكات</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="behaviorSeverity">مستوى الملاحظة *</label>
+                    <select id="behaviorSeverity" class="form-select" required>
+                        <option value="">اختر المستوى</option>
+                        <option value="إيجابي">✅ إيجابي</option>
+                        <option value="بسيط">⚠️ بسيط</option>
+                        <option value="متوسط">🔶 متوسط</option>
+                        <option value="خطير">🔴 خطير</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="behaviorNotes">تفاصيل الملاحظة</label>
+                    <textarea id="behaviorNotes" class="form-textarea" rows="3" placeholder="اكتب تفاصيل الملاحظة هنا..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="behaviorAction">الإجراء المتخذ</label>
+                    <textarea id="behaviorAction" class="form-textarea" rows="2" placeholder="ما هو الإجراء الذي تم اتخاذه؟"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="behaviorSendNotification">
+                        <span>إرسال إشعار واتساب لولي الأمر</span>
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> حفظ
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="cancelBehaviorModal">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة إعدادات واتساب -->
+<div id="whatsappSettingsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>إعدادات واتساب</h3>
+            <button class="modal-close" id="closeWhatsappSettings">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <p>يمكنك إدخال معلومات API لإرسال الرسائل تلقائياً، أو تركها فارغة لفتح واتساب ويب مباشرة.</p>
+            </div>
+
+            <form id="whatsappSettingsForm">
+                <div class="form-group">
+                    <label for="whatsappApiUrl">رابط API (اختياري)</label>
+                    <input type="url" id="whatsappApiUrl" class="form-input" placeholder="https://api.whatsapp.com/send">
+                </div>
+
+                <div class="form-group">
+                    <label for="whatsappApiKey">مفتاح API (اختياري)</label>
+                    <input type="password" id="whatsappApiKey" class="form-input" placeholder="أدخل مفتاح API">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> حفظ الإعدادات
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="cancelWhatsappSettings">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
