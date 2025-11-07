@@ -210,10 +210,10 @@
                     <table class="data-table" id="studentsTable">
                         <thead>
                             <tr>
-                                <th>رقم الطالب</th>
+                                <th>الرقم المدرسي</th>
                                 <th>الاسم</th>
                                 <th>الصف</th>
-                                <th>تاريخ الميلاد</th>
+                                <th>الجنسية</th>
                                 <th>الإجراءات</th>
                             </tr>
                         </thead>
@@ -593,13 +593,13 @@
                     <input type="hidden" id="studentId">
 
                     <div class="form-group">
-                        <label for="studentNumber">رقم الطالب *</label>
-                        <input type="text" id="studentNumber" class="form-input" required placeholder="رقم الطالب">
+                        <label for="studentNumber">الرقم المدرسي *</label>
+                        <input type="text" id="studentNumber" class="form-input" required placeholder="مثال: 411615650999">
                     </div>
 
                     <div class="form-group">
-                        <label for="studentName">اسم الطالب *</label>
-                        <input type="text" id="studentName" class="form-input" required placeholder="الاسم الكامل">
+                        <label for="studentName">الاسم *</label>
+                        <input type="text" id="studentName" class="form-input" required placeholder="مثال: عزان بن محمد بن احمد بن مطر الحضرمي">
                     </div>
 
                     <div class="form-group">
@@ -610,27 +610,18 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="studentBirthDate">تاريخ الميلاد *</label>
-                        <input type="date" id="studentBirthDate" class="form-input" required>
+                        <label for="studentNationality">الجنسية *</label>
+                        <input type="text" id="studentNationality" class="form-input" required placeholder="مثال: عماني">
                     </div>
 
                     <div class="form-group">
-                        <label for="studentGender">الجنس *</label>
-                        <select id="studentGender" class="form-select" required>
-                            <option value="">اختر الجنس</option>
-                            <option value="ذكر">ذكر</option>
-                            <option value="أنثى">أنثى</option>
-                        </select>
+                        <label for="studentResidentialArea">المنطقة السكنية *</label>
+                        <input type="text" id="studentResidentialArea" class="form-input" required placeholder="مثال: فرق">
                     </div>
 
                     <div class="form-group">
-                        <label for="studentEmail">البريد الإلكتروني</label>
-                        <input type="email" id="studentEmail" class="form-input" placeholder="البريد الإلكتروني (اختياري)">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="studentPhone">رقم الجوال</label>
-                        <input type="tel" id="studentPhone" class="form-input" placeholder="رقم جوال ولي الأمر (اختياري)">
+                        <label for="studentPhone">الهاتف النقال *</label>
+                        <input type="tel" id="studentPhone" class="form-input" required placeholder="مثال: 99887897">
                     </div>
 
                     <div class="form-actions">

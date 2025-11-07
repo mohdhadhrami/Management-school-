@@ -73,32 +73,11 @@ class ImportExportManager {
         };
 
         return {
-            studentNumber: getValue(['رقم الطالب', 'الرقم', 'رقم', 'Student Number', 'Number', 'ID']),
+            studentNumber: getValue(['الرقم المدرسي', 'رقم الطالب', 'الرقم', 'رقم', 'Student Number', 'Number', 'ID']),
             name: getValue(['الاسم', 'اسم الطالب', 'Name', 'Student Name']),
-            nationalId: getValue(['رقم الهوية', 'الهوية الوطنية', 'National ID', 'ID Number']),
-            birthDate: this.formatDate(getValue(['تاريخ الميلاد', 'تاريخ_الميلاد', 'Birth Date', 'DOB'])),
-            gender: getValue(['الجنس', 'Gender']),
-            nationality: getValue(['الجنسية', 'Nationality']) || 'سعودي',
-            email: getValue(['البريد الإلكتروني', 'البريد', 'Email']),
-            phone: getValue(['رقم الجوال', 'الجوال', 'Phone', 'Mobile']),
-            guardianName: getValue(['اسم ولي الأمر', 'ولي الأمر', 'Guardian Name', 'Parent Name']),
-            guardianPhone: getValue(['جوال ولي الأمر', 'Guardian Phone', 'Parent Phone']),
-            guardianRelation: getValue(['صلة القرابة', 'Relation']) || 'والد',
-            address: getValue(['العنوان', 'Address']),
-            city: getValue(['المدينة', 'City']),
-            district: getValue(['الحي', 'District']),
-            postalCode: getValue(['الرمز البريدي', 'Postal Code']),
-            previousSchool: getValue(['المدرسة السابقة', 'Previous School']),
-            medicalNotes: getValue(['ملاحظات صحية', 'Medical Notes']),
-            specialNeeds: getValue(['احتياجات خاصة', 'Special Needs']),
-            // حقول إضافية للبوابة التعليمية
-            portalId: getValue(['رقم البوابة', 'Portal ID']),
-            enrollmentDate: this.formatDate(getValue(['تاريخ التسجيل', 'Enrollment Date'])),
-            academicYear: getValue(['العام الدراسي', 'Academic Year']),
-            classNumber: getValue(['رقم الصف', 'Class Number']),
-            section: getValue(['الشعبة', 'Section']),
-            busNumber: getValue(['رقم الحافلة', 'Bus Number']),
-            notes: getValue(['ملاحظات', 'Notes'])
+            nationality: getValue(['الجنسية', 'Nationality']) || 'عماني',
+            residentialArea: getValue(['المنطقة السكنية', 'المنطقة', 'Residential Area', 'Area']),
+            guardianPhone: getValue(['الهاتف النقال', 'الهاتف', 'رقم الجوال', 'الجوال', 'Phone', 'Mobile'])
         };
     }
 
@@ -130,60 +109,38 @@ class ImportExportManager {
     // تنزيل قالب Excel للطلاب
     downloadStudentsTemplate() {
         const headers = [
-            'رقم الطالب',
+            'م',
             'الاسم',
-            'رقم الهوية',
-            'تاريخ الميلاد',
-            'الجنس',
+            'الرقم المدرسي',
             'الجنسية',
-            'البريد الإلكتروني',
-            'رقم الجوال',
-            'اسم ولي الأمر',
-            'جوال ولي الأمر',
-            'صلة القرابة',
-            'العنوان',
-            'المدينة',
-            'الحي',
-            'الرمز البريدي',
-            'المدرسة السابقة',
-            'ملاحظات صحية',
-            'احتياجات خاصة',
-            'رقم البوابة',
-            'تاريخ التسجيل',
-            'العام الدراسي',
-            'رقم الصف',
-            'الشعبة',
-            'رقم الحافلة',
-            'ملاحظات'
+            'المنطقة السكنية',
+            'الهاتف النقال'
         ];
 
         const sampleData = [
             [
-                '1001',
-                'محمد أحمد علي',
-                '1234567890',
-                '2010-05-15',
-                'ذكر',
-                'سعودي',
-                'student@example.com',
-                '0501234567',
-                'أحمد علي',
-                '0501234568',
-                'والد',
-                'شارع الملك فهد',
-                'الرياض',
-                'النرجس',
-                '12345',
-                'مدرسة الأمل',
-                '',
-                '',
-                'P1001',
-                '2024-09-01',
-                '1446-1447',
                 '1',
-                'أ',
-                '5',
-                ''
+                'عزان بن محمد بن احمد بن مطر الحضرمي',
+                '411615650999',
+                'عماني',
+                'فرق',
+                '99887897'
+            ],
+            [
+                '2',
+                'سالم بن خالد بن سعيد الرواحي',
+                '411615651000',
+                'عماني',
+                'الرستاق',
+                '99123456'
+            ],
+            [
+                '3',
+                'أحمد بن علي بن محمد البلوشي',
+                '411615651001',
+                'عماني',
+                'صحار',
+                '99234567'
             ]
         ];
 
@@ -192,7 +149,14 @@ class ImportExportManager {
         XLSX.utils.book_append_sheet(wb, ws, 'الطلاب');
 
         // تنسيق الأعمدة
-        ws['!cols'] = headers.map(() => ({ wch: 15 }));
+        ws['!cols'] = [
+            { wch: 5 },   // م
+            { wch: 40 },  // الاسم
+            { wch: 15 },  // الرقم المدرسي
+            { wch: 12 },  // الجنسية
+            { wch: 18 },  // المنطقة السكنية
+            { wch: 15 }   // الهاتف النقال
+        ];
 
         XLSX.writeFile(wb, 'قالب_الطلاب.xlsx');
     }
@@ -245,24 +209,22 @@ class ImportExportManager {
     async studentsToCSV() {
         const students = await db.getAll('students');
         const headers = [
-            'رقم الطالب', 'الاسم', 'رقم الهوية', 'تاريخ الميلاد', 'الجنس',
-            'البريد الإلكتروني', 'رقم الجوال', 'اسم ولي الأمر', 'جوال ولي الأمر'
+            'م', 'الاسم', 'الرقم المدرسي', 'الجنسية', 'المنطقة السكنية', 'الهاتف النقال', 'الصف'
         ];
 
         let csv = '\uFEFF' + headers.join(',') + '\n'; // BOM for UTF-8
 
+        let index = 1;
         for (const student of students) {
             const classData = await db.get('classes', student.classId);
             const row = [
-                student.studentNumber,
+                index++,
                 student.name,
-                student.nationalId || '',
-                student.birthDate,
-                student.gender,
-                student.email || '',
-                student.phone || '',
-                student.guardianName || '',
-                student.guardianPhone || ''
+                student.studentNumber,
+                student.nationality || 'عماني',
+                student.residentialArea || '',
+                student.guardianPhone || '',
+                classData ? classData.name : ''
             ];
             csv += row.map(field => `"${field}"`).join(',') + '\n';
         }
@@ -322,15 +284,16 @@ class ImportExportManager {
         const students = await db.getAll('students');
         let xml = '<students>\n';
 
+        let index = 1;
         for (const student of students) {
             const classData = await db.get('classes', student.classId);
             xml += '  <student>\n';
-            xml += `    <studentNumber>${this.escapeXML(student.studentNumber)}</studentNumber>\n`;
+            xml += `    <number>${index++}</number>\n`;
             xml += `    <name>${this.escapeXML(student.name)}</name>\n`;
-            xml += `    <nationalId>${this.escapeXML(student.nationalId || '')}</nationalId>\n`;
-            xml += `    <birthDate>${student.birthDate}</birthDate>\n`;
-            xml += `    <gender>${this.escapeXML(student.gender)}</gender>\n`;
-            xml += `    <email>${this.escapeXML(student.email || '')}</email>\n`;
+            xml += `    <studentNumber>${this.escapeXML(student.studentNumber)}</studentNumber>\n`;
+            xml += `    <nationality>${this.escapeXML(student.nationality || 'عماني')}</nationality>\n`;
+            xml += `    <residentialArea>${this.escapeXML(student.residentialArea || '')}</residentialArea>\n`;
+            xml += `    <guardianPhone>${this.escapeXML(student.guardianPhone || '')}</guardianPhone>\n`;
             xml += `    <class>${this.escapeXML(classData ? classData.name : '')}</class>\n`;
             xml += '  </student>\n';
         }
@@ -422,28 +385,32 @@ class ImportExportManager {
     async addStudentsSheet(wb) {
         const students = await db.getAll('students');
         const data = [
-            ['رقم الطالب', 'الاسم', 'رقم الهوية', 'تاريخ الميلاد', 'الجنس',
-             'البريد الإلكتروني', 'رقم الجوال', 'الصف']
+            ['م', 'الاسم', 'الرقم المدرسي', 'الجنسية', 'المنطقة السكنية', 'الهاتف النقال', 'الصف']
         ];
 
+        let index = 1;
         for (const student of students) {
             const classData = await db.get('classes', student.classId);
             data.push([
-                student.studentNumber,
+                index++,
                 student.name,
-                student.nationalId || '',
-                student.birthDate,
-                student.gender,
-                student.email || '',
-                student.phone || '',
+                student.studentNumber,
+                student.nationality || 'عماني',
+                student.residentialArea || '',
+                student.guardianPhone || '',
                 classData ? classData.name : ''
             ]);
         }
 
         const ws = XLSX.utils.aoa_to_sheet(data);
         ws['!cols'] = [
-            { wch: 12 }, { wch: 25 }, { wch: 15 }, { wch: 12 },
-            { wch: 8 }, { wch: 25 }, { wch: 15 }, { wch: 20 }
+            { wch: 5 },   // م
+            { wch: 40 },  // الاسم
+            { wch: 15 },  // الرقم المدرسي
+            { wch: 12 },  // الجنسية
+            { wch: 18 },  // المنطقة السكنية
+            { wch: 15 },  // الهاتف النقال
+            { wch: 20 }   // الصف
         ];
         XLSX.utils.book_append_sheet(wb, ws, 'الطلاب');
     }

@@ -482,7 +482,7 @@ class GradesApp {
                 <td>${student.studentNumber}</td>
                 <td>${student.name}</td>
                 <td>${student.className}</td>
-                <td>${student.birthDate}</td>
+                <td>${student.nationality || 'عماني'}</td>
                 <td>
                     <button class="icon-btn" onclick="app.editStudent(${student.id})" title="تعديل">
                         <i class="fas fa-edit"></i>
@@ -545,10 +545,9 @@ class GradesApp {
             document.getElementById('studentNumber').value = student.studentNumber;
             document.getElementById('studentName').value = student.name;
             document.getElementById('studentClass').value = student.classId;
-            document.getElementById('studentBirthDate').value = student.birthDate;
-            document.getElementById('studentGender').value = student.gender;
-            document.getElementById('studentEmail').value = student.email || '';
-            document.getElementById('studentPhone').value = student.phone || '';
+            document.getElementById('studentNationality').value = student.nationality || 'عماني';
+            document.getElementById('studentResidentialArea').value = student.residentialArea || '';
+            document.getElementById('studentPhone').value = student.guardianPhone || '';
         }
     }
 
@@ -566,10 +565,9 @@ class GradesApp {
             studentNumber: document.getElementById('studentNumber').value,
             name: document.getElementById('studentName').value,
             classId: parseInt(document.getElementById('studentClass').value),
-            birthDate: document.getElementById('studentBirthDate').value,
-            gender: document.getElementById('studentGender').value,
-            email: document.getElementById('studentEmail').value,
-            phone: document.getElementById('studentPhone').value
+            nationality: document.getElementById('studentNationality').value,
+            residentialArea: document.getElementById('studentResidentialArea').value,
+            guardianPhone: document.getElementById('studentPhone').value
         };
 
         try {
@@ -588,7 +586,7 @@ class GradesApp {
         } catch (error) {
             console.error('خطأ في حفظ الطالب:', error);
             if (error.includes && error.includes('unique')) {
-                alert('رقم الطالب موجود مسبقاً');
+                alert('الرقم المدرسي موجود مسبقاً');
             } else {
                 alert('حدث خطأ أثناء حفظ الطالب');
             }
