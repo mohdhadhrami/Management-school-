@@ -1196,3 +1196,191 @@ body {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
 }
+
+/* ==================== أنماط الملاحظات السلوكية ==================== */
+
+/* شارات نوع الملاحظة */
+.behavior-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.behavior-badge.side_talk {
+    background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
+    color: white;
+}
+
+.behavior-badge.no_book {
+    background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+    color: white;
+}
+
+.behavior-badge.sleeping {
+    background: linear-gradient(135deg, #ab47bc 0%, #8e24aa 100%);
+    color: white;
+}
+
+.behavior-badge.no_attention {
+    background: linear-gradient(135deg, #ffd54f 0%, #ffc107 100%);
+    color: #333;
+}
+
+.behavior-badge.late {
+    background: linear-gradient(135deg, #ff7043 0%, #f4511e 100%);
+    color: white;
+}
+
+.behavior-badge.homework {
+    background: linear-gradient(135deg, #ec407a 0%, #d81b60 100%);
+    color: white;
+}
+
+.behavior-badge.disruption {
+    background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+    color: white;
+}
+
+.behavior-badge.positive {
+    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+    color: white;
+}
+
+.behavior-badge.other {
+    background: linear-gradient(135deg, #78909c 0%, #546e7a 100%);
+    color: white;
+}
+
+/* بطاقات الملاحظات */
+.behavior-note-card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border-right: 4px solid transparent;
+}
+
+.behavior-note-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.behavior-note-card.negative {
+    border-right-color: var(--danger-color);
+}
+
+.behavior-note-card.positive {
+    border-right-color: var(--success-color);
+}
+
+.behavior-note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.behavior-note-student {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.behavior-note-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.behavior-note-meta i {
+    margin-left: 0.25rem;
+}
+
+.behavior-note-details {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 0.75rem 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.behavior-note-action {
+    background: rgba(76, 175, 80, 0.1);
+    border-right: 3px solid var(--success-color);
+    padding: 0.75rem;
+    border-radius: 5px;
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.behavior-note-action-label {
+    font-weight: 600;
+    color: var(--success-color);
+    margin-left: 0.5rem;
+}
+
+.behavior-note-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+/* إحصائيات الملاحظات السلوكية */
+.behavior-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.behavior-stat-card {
+    background: var(--card-bg);
+    padding: 1.25rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.behavior-stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.behavior-stat-label {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+/* تحسينات responsive للملاحظات السلوكية */
+@media (max-width: 768px) {
+    .behavior-note-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .behavior-note-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .behavior-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .behavior-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -2,7 +2,7 @@
 class GradesDB {
     constructor() {
         this.dbName = 'GradesManagementDB';
-        this.version = 2; // تحديث الإصدار لدعم الحقول الإضافية
+        this.version = 3; // تحديث الإصدار لدعم الملاحظات السلوكية
         this.db = null;
     }
 
@@ -61,6 +61,16 @@ class GradesDB {
                     const activitiesStore = db.createObjectStore('activities', { keyPath: 'id', autoIncrement: true });
                     activitiesStore.createIndex('timestamp', 'timestamp', { unique: false });
                     activitiesStore.createIndex('type', 'type', { unique: false });
+                }
+
+                // إنشاء جدول الملاحظات السلوكية
+                if (!db.objectStoreNames.contains('behaviorNotes')) {
+                    const behaviorNotesStore = db.createObjectStore('behaviorNotes', { keyPath: 'id', autoIncrement: true });
+                    behaviorNotesStore.createIndex('studentId', 'studentId', { unique: false });
+                    behaviorNotesStore.createIndex('classId', 'classId', { unique: false });
+                    behaviorNotesStore.createIndex('date', 'date', { unique: false });
+                    behaviorNotesStore.createIndex('noteType', 'noteType', { unique: false });
+                    behaviorNotesStore.createIndex('timestamp', 'timestamp', { unique: false });
                 }
 
                 console.log('تم إنشاء هيكل قاعدة البيانات');
@@ -498,7 +508,88 @@ class GradesDB {
         await this.clear('assessments');
         await this.clear('grades');
         await this.clear('activities');
+        await this.clear('behaviorNotes');
         await this.addActivity('system', 'تم مسح جميع البيانات');
+    }
+
+    // ==================== دوال الملاحظات السلوكية ====================
+
+    // إضافة ملاحظة سلوكية
+    async addBehaviorNote(noteData) {
+        const noteId = await this.add('behaviorNotes', {
+            ...noteData,
+            timestamp: new Date().toISOString(),
+            createdAt: new Date().toISOString()
+        });
+
+        const student = await this.get('students', noteData.studentId);
+        await this.addActivity('behaviorNote', `تمت إضافة ملاحظة سلوكية للطالب: ${student.name}`, { noteId, studentId: noteData.studentId });
+        return noteId;
+    }
+
+    // تحديث ملاحظة سلوكية
+    async updateBehaviorNote(noteData) {
+        const updatedData = {
+            ...noteData,
+            updatedAt: new Date().toISOString()
+        };
+        await this.update('behaviorNotes', updatedData);
+        await this.addActivity('behaviorNote', 'تم تحديث ملاحظة سلوكية', { noteId: noteData.id });
+    }
+
+    // حذف ملاحظة سلوكية
+    async deleteBehaviorNote(noteId) {
+        const note = await this.get('behaviorNotes', noteId);
+        await this.delete('behaviorNotes', noteId);
+        await this.addActivity('behaviorNote', 'تم حذف ملاحظة سلوكية', { noteId });
+    }
+
+    // الحصول على ملاحظات طالب معين
+    async getStudentBehaviorNotes(studentId) {
+        const notes = await this.getByIndex('behaviorNotes', 'studentId', studentId);
+        return notes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+
+    // الحصول على ملاحظات صف معين
+    async getClassBehaviorNotes(classId) {
+        const notes = await this.getByIndex('behaviorNotes', 'classId', classId);
+        return notes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+
+    // الحصول على ملاحظات حسب التاريخ
+    async getBehaviorNotesByDate(date) {
+        const notes = await this.getByIndex('behaviorNotes', 'date', date);
+        return notes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+
+    // الحصول على ملاحظات حسب النوع
+    async getBehaviorNotesByType(noteType) {
+        const notes = await this.getByIndex('behaviorNotes', 'noteType', noteType);
+        return notes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+
+    // الحصول على جميع الملاحظات السلوكية
+    async getAllBehaviorNotes() {
+        const notes = await this.getAll('behaviorNotes');
+        return notes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+
+    // الحصول على إحصائيات الملاحظات السلوكية للطالب
+    async getStudentBehaviorStats(studentId) {
+        const notes = await this.getStudentBehaviorNotes(studentId);
+        const stats = {
+            total: notes.length,
+            byType: {}
+        };
+
+        notes.forEach(note => {
+            if (!stats.byType[note.noteType]) {
+                stats.byType[note.noteType] = 0;
+            }
+            stats.byType[note.noteType]++;
+        });
+
+        return stats;
     }
 }
 

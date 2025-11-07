@@ -128,6 +128,51 @@ class GradesApp {
             this.loadGradesTable();
         });
 
+        // أحداث الملاحظات السلوكية
+        document.getElementById('addBehaviorNoteBtn').addEventListener('click', () => {
+            this.openBehaviorNoteModal();
+        });
+
+        document.getElementById('closeBehaviorNoteModal').addEventListener('click', () => {
+            this.closeBehaviorNoteModal();
+        });
+
+        document.getElementById('cancelBehaviorNoteModal').addEventListener('click', () => {
+            this.closeBehaviorNoteModal();
+        });
+
+        document.getElementById('behaviorNoteForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.saveBehaviorNote();
+        });
+
+        // تحديث قائمة الطلاب عند تغيير الصف في نافذة الملاحظات
+        document.getElementById('behaviorNoteClass').addEventListener('change', () => {
+            this.loadStudentsForBehaviorNote();
+        });
+
+        // فلاتر الملاحظات السلوكية
+        document.getElementById('behaviorFilterClass').addEventListener('change', () => {
+            this.loadBehaviorFilterStudents();
+            this.loadBehaviorNotes();
+        });
+
+        document.getElementById('behaviorFilterStudent').addEventListener('change', () => {
+            this.loadBehaviorNotes();
+        });
+
+        document.getElementById('behaviorFilterType').addEventListener('change', () => {
+            this.loadBehaviorNotes();
+        });
+
+        document.getElementById('behaviorFilterDate').addEventListener('change', () => {
+            this.loadBehaviorNotes();
+        });
+
+        document.getElementById('clearBehaviorFiltersBtn').addEventListener('click', () => {
+            this.clearBehaviorFilters();
+        });
+
         // إغلاق النوافذ المنبثقة عند النقر خارجها
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', (e) => {
@@ -180,6 +225,9 @@ class GradesApp {
                 break;
             case 'grades':
                 await this.loadGradesPage();
+                break;
+            case 'behavior':
+                await this.loadBehaviorPage();
                 break;
             case 'reports':
                 // سيتم تطويره لاحقاً
@@ -919,6 +967,258 @@ class GradesApp {
             return Math.floor(interval) + ' دقيقة';
         }
         return 'الآن';
+    }
+
+    // ==================== دوال الملاحظات السلوكية ====================
+
+    // تحميل صفحة الملاحظات السلوكية
+    async loadBehaviorPage() {
+        await this.loadClassesForBehaviorFilters();
+        await this.loadBehaviorNotes();
+    }
+
+    // تحميل الصفوف في فلاتر الملاحظات
+    async loadClassesForBehaviorFilters() {
+        const classes = await db.getAll('classes');
+        const classSelect = document.getElementById('behaviorFilterClass');
+        const modalClassSelect = document.getElementById('behaviorNoteClass');
+
+        classSelect.innerHTML = '<option value="">جميع الصفوف</option>';
+        modalClassSelect.innerHTML = '<option value="">اختر الصف</option>';
+
+        classes.forEach(cls => {
+            const option = document.createElement('option');
+            option.value = cls.id;
+            option.textContent = `${cls.name} - ${cls.subject}`;
+            classSelect.appendChild(option);
+
+            const modalOption = option.cloneNode(true);
+            modalClassSelect.appendChild(modalOption);
+        });
+    }
+
+    // تحميل الطلاب في فلتر الملاحظات بناءً على الصف المختار
+    async loadBehaviorFilterStudents() {
+        const classId = document.getElementById('behaviorFilterClass').value;
+        const studentSelect = document.getElementById('behaviorFilterStudent');
+
+        studentSelect.innerHTML = '<option value="">جميع الطلاب</option>';
+
+        if (classId) {
+            const students = await db.getStudentsByClass(parseInt(classId));
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = `${student.name} (${student.studentNumber})`;
+                studentSelect.appendChild(option);
+            });
+        }
+    }
+
+    // تحميل الطلاب في نافذة إضافة الملاحظة بناءً على الصف المختار
+    async loadStudentsForBehaviorNote() {
+        const classId = document.getElementById('behaviorNoteClass').value;
+        const studentSelect = document.getElementById('behaviorNoteStudent');
+
+        studentSelect.innerHTML = '<option value="">اختر الطالب</option>';
+
+        if (classId) {
+            const students = await db.getStudentsByClass(parseInt(classId));
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = `${student.name} (${student.studentNumber})`;
+                studentSelect.appendChild(option);
+            });
+        }
+    }
+
+    // فتح نافذة إضافة ملاحظة سلوكية
+    openBehaviorNoteModal(noteId = null) {
+        const modal = document.getElementById('behaviorNoteModal');
+        const title = document.getElementById('behaviorNoteModalTitle');
+        const form = document.getElementById('behaviorNoteForm');
+
+        if (noteId) {
+            title.textContent = 'تعديل ملاحظة سلوكية';
+            this.loadBehaviorNoteData(noteId);
+        } else {
+            title.textContent = 'إضافة ملاحظة سلوكية';
+            form.reset();
+            document.getElementById('behaviorNoteId').value = '';
+            // تعيين التاريخ والوقت الحالي
+            const now = new Date();
+            document.getElementById('behaviorNoteDate').value = now.toISOString().split('T')[0];
+            document.getElementById('behaviorNoteTime').value = now.toTimeString().slice(0, 5);
+        }
+
+        modal.classList.add('active');
+    }
+
+    // تحميل بيانات ملاحظة للتعديل
+    async loadBehaviorNoteData(noteId) {
+        const note = await db.get('behaviorNotes', noteId);
+        if (note) {
+            document.getElementById('behaviorNoteId').value = note.id;
+            document.getElementById('behaviorNoteClass').value = note.classId;
+            await this.loadStudentsForBehaviorNote();
+            document.getElementById('behaviorNoteStudent').value = note.studentId;
+            document.getElementById('behaviorNoteType').value = note.noteType;
+            document.getElementById('behaviorNoteDate').value = note.date;
+            document.getElementById('behaviorNoteTime').value = note.time;
+            document.getElementById('behaviorNoteDetails').value = note.details;
+            document.getElementById('behaviorNoteAction').value = note.action || '';
+        }
+    }
+
+    // إغلاق نافذة الملاحظات
+    closeBehaviorNoteModal() {
+        document.getElementById('behaviorNoteModal').classList.remove('active');
+        document.getElementById('behaviorNoteForm').reset();
+    }
+
+    // حفظ ملاحظة سلوكية
+    async saveBehaviorNote() {
+        const noteId = document.getElementById('behaviorNoteId').value;
+        const noteData = {
+            classId: parseInt(document.getElementById('behaviorNoteClass').value),
+            studentId: parseInt(document.getElementById('behaviorNoteStudent').value),
+            noteType: document.getElementById('behaviorNoteType').value,
+            date: document.getElementById('behaviorNoteDate').value,
+            time: document.getElementById('behaviorNoteTime').value,
+            details: document.getElementById('behaviorNoteDetails').value,
+            action: document.getElementById('behaviorNoteAction').value
+        };
+
+        try {
+            if (noteId) {
+                noteData.id = parseInt(noteId);
+                await db.updateBehaviorNote(noteData);
+                alert('تم تحديث الملاحظة بنجاح');
+            } else {
+                await db.addBehaviorNote(noteData);
+                alert('تمت إضافة الملاحظة بنجاح');
+            }
+
+            this.closeBehaviorNoteModal();
+            await this.loadBehaviorNotes();
+        } catch (error) {
+            console.error('خطأ في حفظ الملاحظة:', error);
+            alert('حدث خطأ أثناء حفظ الملاحظة');
+        }
+    }
+
+    // تحميل وعرض الملاحظات السلوكية
+    async loadBehaviorNotes() {
+        try {
+            let notes = await db.getAllBehaviorNotes();
+
+            // تطبيق الفلاتر
+            const filterClassId = document.getElementById('behaviorFilterClass').value;
+            const filterStudentId = document.getElementById('behaviorFilterStudent').value;
+            const filterType = document.getElementById('behaviorFilterType').value;
+            const filterDate = document.getElementById('behaviorFilterDate').value;
+
+            if (filterClassId) {
+                notes = notes.filter(note => note.classId === parseInt(filterClassId));
+            }
+
+            if (filterStudentId) {
+                notes = notes.filter(note => note.studentId === parseInt(filterStudentId));
+            }
+
+            if (filterType) {
+                notes = notes.filter(note => note.noteType === filterType);
+            }
+
+            if (filterDate) {
+                notes = notes.filter(note => note.date === filterDate);
+            }
+
+            // عرض الملاحظات
+            await this.renderBehaviorNotes(notes);
+        } catch (error) {
+            console.error('خطأ في تحميل الملاحظات:', error);
+        }
+    }
+
+    // عرض الملاحظات في الجدول
+    async renderBehaviorNotes(notes) {
+        const tbody = document.getElementById('behaviorNotesTableBody');
+
+        if (notes.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="7">لا توجد ملاحظات سلوكية</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = '';
+
+        for (const note of notes) {
+            const student = await db.get('students', note.studentId);
+            const classData = await db.get('classes', note.classId);
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${note.date}</td>
+                <td>${note.time}</td>
+                <td>${student ? student.name : 'غير معروف'}</td>
+                <td>${classData ? classData.name : 'غير معروف'}</td>
+                <td>${this.getBehaviorTypeLabel(note.noteType)}</td>
+                <td><div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${note.details}">${note.details}</div></td>
+                <td>
+                    <button class="btn btn-sm btn-secondary" onclick="app.openBehaviorNoteModal(${note.id})" title="تعديل">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="app.deleteBehaviorNote(${note.id})" title="حذف">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(row);
+        }
+    }
+
+    // الحصول على تسمية نوع الملاحظة
+    getBehaviorTypeLabel(type) {
+        const types = {
+            'side_talk': 'الحديث الجانبي',
+            'no_book': 'عدم إحضار الكتاب',
+            'sleeping': 'النوم في الحصة',
+            'no_attention': 'عدم الانتباه',
+            'late': 'التأخر',
+            'homework': 'عدم حل الواجب',
+            'disruption': 'إثارة الفوضى',
+            'positive': 'ملاحظة إيجابية',
+            'other': 'أخرى'
+        };
+
+        return `<span class="behavior-badge ${type}">${types[type] || type}</span>`;
+    }
+
+    // حذف ملاحظة سلوكية
+    async deleteBehaviorNote(noteId) {
+        if (!confirm('هل أنت متأكد من حذف هذه الملاحظة؟')) {
+            return;
+        }
+
+        try {
+            await db.deleteBehaviorNote(noteId);
+            alert('تم حذف الملاحظة بنجاح');
+            await this.loadBehaviorNotes();
+        } catch (error) {
+            console.error('خطأ في حذف الملاحظة:', error);
+            alert('حدث خطأ أثناء حذف الملاحظة');
+        }
+    }
+
+    // مسح الفلاتر
+    clearBehaviorFilters() {
+        document.getElementById('behaviorFilterClass').value = '';
+        document.getElementById('behaviorFilterStudent').value = '';
+        document.getElementById('behaviorFilterType').value = '';
+        document.getElementById('behaviorFilterDate').value = '';
+        this.loadBehaviorNotes();
     }
 }
 

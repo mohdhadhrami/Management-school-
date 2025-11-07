@@ -58,6 +58,10 @@
                     <i class="fas fa-table"></i>
                     <span>كشف الدرجات</span>
                 </a>
+                <a href="#" class="nav-item" data-page="behavior">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>المتابعة السلوكية</span>
+                </a>
                 <a href="#" class="nav-item" data-page="reports">
                     <i class="fas fa-chart-bar"></i>
                     <span>التقارير والإحصائيات</span>
@@ -271,6 +275,77 @@
                     <div id="gradesTableContainer">
                         <p class="empty-state">اختر صف وأداة تقويم لعرض الدرجات</p>
                     </div>
+                </div>
+            </div>
+
+            <!-- صفحة المتابعة السلوكية -->
+            <div id="behavior-page" class="page">
+                <div class="page-header">
+                    <div>
+                        <h2>المتابعة السلوكية اليومية</h2>
+                        <p class="page-description">تسجيل ومتابعة الملاحظات السلوكية للطلاب</p>
+                    </div>
+                    <button class="btn btn-primary" id="addBehaviorNoteBtn">
+                        <i class="fas fa-plus"></i> إضافة ملاحظة
+                    </button>
+                </div>
+
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label>الصف:</label>
+                        <select id="behaviorFilterClass" class="form-select">
+                            <option value="">جميع الصفوف</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>الطالب:</label>
+                        <select id="behaviorFilterStudent" class="form-select">
+                            <option value="">جميع الطلاب</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>نوع الملاحظة:</label>
+                        <select id="behaviorFilterType" class="form-select">
+                            <option value="">جميع الأنواع</option>
+                            <option value="side_talk">الحديث الجانبي</option>
+                            <option value="no_book">عدم إحضار الكتاب</option>
+                            <option value="sleeping">النوم في الحصة</option>
+                            <option value="no_attention">عدم الانتباه</option>
+                            <option value="late">التأخر</option>
+                            <option value="homework">عدم حل الواجب</option>
+                            <option value="disruption">إثارة الفوضى</option>
+                            <option value="positive">ملاحظة إيجابية</option>
+                            <option value="other">أخرى</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>التاريخ:</label>
+                        <input type="date" id="behaviorFilterDate" class="form-control">
+                    </div>
+                    <button class="btn btn-secondary" id="clearBehaviorFiltersBtn">
+                        <i class="fas fa-times"></i> مسح الفلاتر
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="behaviorNotesTable">
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>الوقت</th>
+                                <th>الطالب</th>
+                                <th>الصف</th>
+                                <th>نوع الملاحظة</th>
+                                <th>التفاصيل</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="behaviorNotesTableBody">
+                            <tr class="empty-row">
+                                <td colspan="7">لا توجد ملاحظات سلوكية</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -640,6 +715,82 @@
                             <i class="fas fa-save"></i> حفظ الإعدادات
                         </button>
                         <button type="button" class="btn btn-secondary" id="cancelPortalSettings">
+                            <i class="fas fa-times"></i> إلغاء
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة منبثقة لإضافة ملاحظة سلوكية -->
+    <div id="behaviorNoteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="behaviorNoteModalTitle">إضافة ملاحظة سلوكية</h3>
+                <button class="modal-close" id="closeBehaviorNoteModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="behaviorNoteForm">
+                    <input type="hidden" id="behaviorNoteId">
+
+                    <div class="form-group">
+                        <label for="behaviorNoteClass">الصف *</label>
+                        <select id="behaviorNoteClass" class="form-select" required>
+                            <option value="">اختر الصف</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="behaviorNoteStudent">الطالب *</label>
+                        <select id="behaviorNoteStudent" class="form-select" required>
+                            <option value="">اختر الطالب</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="behaviorNoteType">نوع الملاحظة *</label>
+                        <select id="behaviorNoteType" class="form-select" required>
+                            <option value="">اختر نوع الملاحظة</option>
+                            <option value="side_talk">الحديث الجانبي</option>
+                            <option value="no_book">عدم إحضار الكتاب</option>
+                            <option value="sleeping">النوم في الحصة</option>
+                            <option value="no_attention">عدم الانتباه</option>
+                            <option value="late">التأخر</option>
+                            <option value="homework">عدم حل الواجب</option>
+                            <option value="disruption">إثارة الفوضى</option>
+                            <option value="positive">ملاحظة إيجابية</option>
+                            <option value="other">أخرى</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="behaviorNoteDate">التاريخ *</label>
+                        <input type="date" id="behaviorNoteDate" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="behaviorNoteTime">الوقت *</label>
+                        <input type="time" id="behaviorNoteTime" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="behaviorNoteDetails">تفاصيل الملاحظة *</label>
+                        <textarea id="behaviorNoteDetails" class="form-textarea" rows="4" required placeholder="اكتب تفاصيل الملاحظة السلوكية..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="behaviorNoteAction">الإجراء المتخذ</label>
+                        <textarea id="behaviorNoteAction" class="form-textarea" rows="2" placeholder="الإجراء المتخذ (اختياري)"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> حفظ
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="cancelBehaviorNoteModal">
                             <i class="fas fa-times"></i> إلغاء
                         </button>
                     </div>
