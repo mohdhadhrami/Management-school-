@@ -2,7 +2,7 @@
 class GradesDB {
     constructor() {
         this.dbName = 'GradesManagementDB';
-        this.version = 3; // تحديث الإصدار لدعم المتابعة اليومية
+        this.version = 4; // تحديث الإصدار لدعم العبارات الوصفية
         this.db = null;
     }
 
@@ -88,6 +88,30 @@ class GradesDB {
                     notificationsStore.createIndex('studentId', 'studentId', { unique: false });
                     notificationsStore.createIndex('timestamp', 'timestamp', { unique: false });
                     notificationsStore.createIndex('status', 'status', { unique: false });
+                }
+
+                // إنشاء جدول المعايير (للعبارات الوصفية)
+                if (!db.objectStoreNames.contains('criteria')) {
+                    const criteriaStore = db.createObjectStore('criteria', { keyPath: 'id', autoIncrement: true });
+                    criteriaStore.createIndex('name', 'name', { unique: false });
+                    criteriaStore.createIndex('order', 'order', { unique: false });
+                }
+
+                // إنشاء جدول بنود المعايير
+                if (!db.objectStoreNames.contains('criteriaItems')) {
+                    const itemsStore = db.createObjectStore('criteriaItems', { keyPath: 'id', autoIncrement: true });
+                    itemsStore.createIndex('criteriaId', 'criteriaId', { unique: false });
+                    itemsStore.createIndex('order', 'order', { unique: false });
+                }
+
+                // إنشاء جدول التقييمات الوصفية
+                if (!db.objectStoreNames.contains('descriptiveEvaluations')) {
+                    const evaluationsStore = db.createObjectStore('descriptiveEvaluations', { keyPath: 'id', autoIncrement: true });
+                    evaluationsStore.createIndex('studentId', 'studentId', { unique: false });
+                    evaluationsStore.createIndex('classId', 'classId', { unique: false });
+                    evaluationsStore.createIndex('criteriaId', 'criteriaId', { unique: false });
+                    evaluationsStore.createIndex('date', 'date', { unique: false });
+                    evaluationsStore.createIndex('studentCriteria', ['studentId', 'criteriaId', 'date'], { unique: false });
                 }
 
                 console.log('تم إنشاء هيكل قاعدة البيانات');

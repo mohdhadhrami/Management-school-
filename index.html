@@ -66,6 +66,10 @@
                     <i class="fas fa-clipboard-check"></i>
                     <span>السلوكيات</span>
                 </a>
+                <a href="#" class="nav-item" data-page="descriptive-evaluations">
+                    <i class="fas fa-comment-dots"></i>
+                    <span>العبارات الوصفية</span>
+                </a>
                 <a href="#" class="nav-item" data-page="reports">
                     <i class="fas fa-chart-bar"></i>
                     <span>التقارير والإحصائيات</span>
@@ -420,6 +424,44 @@
 
                 <div class="behaviors-list" id="behaviorsList">
                     <p class="empty-state">لا توجد ملاحظات مسجلة</p>
+                </div>
+            </div>
+
+            <!-- صفحة العبارات الوصفية -->
+            <div id="descriptive-evaluations-page" class="page">
+                <div class="page-header">
+                    <div>
+                        <h2>العبارات الوصفية</h2>
+                        <p class="page-description">تقييم الطلاب وصفياً من خلال معايير متعددة</p>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="evaluateStudentBtn">
+                            <i class="fas fa-plus"></i> تقييم طالب
+                        </button>
+                        <button class="btn btn-secondary" id="manageCriteriaBtn">
+                            <i class="fas fa-cog"></i> إدارة المعايير
+                        </button>
+                    </div>
+                </div>
+
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label>الصف:</label>
+                        <select id="evalFilterClass" class="form-select">
+                            <option value="">جميع الصفوف</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <button class="btn btn-secondary" id="viewEvaluationsBtn">
+                            <i class="fas fa-sync"></i> تحديث
+                        </button>
+                    </div>
+                </div>
+
+                <div class="evaluations-container">
+                    <div id="evaluationsList">
+                        <p class="empty-state">لا توجد تقييمات</p>
+                    </div>
                 </div>
             </div>
 
@@ -983,6 +1025,70 @@
         </div>
     </div>
 
+    <!-- نافذة تقييم طالب -->
+    <div id="evaluationModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>تقييم وصفي للطالب</h3>
+                <button class="modal-close" id="closeEvaluationModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="evaluationForm">
+                    <div class="form-group">
+                        <label for="evalStudentClass">الصف *</label>
+                        <select id="evalStudentClass" class="form-select" required>
+                            <option value="">اختر الصف</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="evalStudentName">الطالب *</label>
+                        <select id="evalStudentName" class="form-select" required>
+                            <option value="">اختر الطالب</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="evalDate">التاريخ *</label>
+                        <input type="date" id="evalDate" class="form-input" required>
+                    </div>
+
+                    <div id="evaluationCriteria" class="evaluation-criteria-container">
+                        <!-- سيتم ملؤها ديناميكياً -->
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> حفظ التقييم
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="cancelEvaluationModal">
+                            <i class="fas fa-times"></i> إلغاء
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إدارة المعايير -->
+    <div id="criteriaManagementModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3>إدارة المعايير والبنود</h3>
+                <button class="modal-close" id="closeCriteriaManagement">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="criteriaList" class="criteria-management-list">
+                    <!-- سيتم ملؤها ديناميكياً -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- حقل استيراد مخفي -->
     <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display: none;">
 
@@ -991,8 +1097,9 @@
     <script src="app.js"></script>
     <script src="app-extensions.js"></script>
     <script src="daily-tracking.js"></script>
+    <script src="descriptive-evaluations.js"></script>
     <script>
-        // تهيئة وظائف الاستيراد والتصدير والمتابعة اليومية بعد تحميل التطبيق
+        // تهيئة وظائف الاستيراد والتصدير والمتابعة اليومية والعبارات الوصفية بعد تحميل التطبيق
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 if (app && app.setupImportExport) {
@@ -1001,6 +1108,10 @@
                 // تهيئة المتابعة اليومية
                 if (typeof DailyTrackingManager !== 'undefined') {
                     window.dailyTracking = new DailyTrackingManager(app);
+                }
+                // تهيئة العبارات الوصفية
+                if (typeof DescriptiveEvaluationsManager !== 'undefined') {
+                    window.descriptiveEval = new DescriptiveEvaluationsManager(app);
                 }
             }, 100);
         });
